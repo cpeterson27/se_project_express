@@ -14,13 +14,13 @@ const getItems = (req, res) => {
       console.error(err);
       return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occured on the server" });
     });
 };
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-const owner = req.user._id;
+  const owner = req.user._id;
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res
@@ -35,7 +35,7 @@ const owner = req.user._id;
       }
       return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occured on the server" });
     });
 };
 
@@ -60,7 +60,7 @@ const getItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occured on the server" });
     });
 };
 
@@ -85,7 +85,7 @@ ClothingItem.findByIdAndDelete(itemId)
       }
       return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occured on the server" });
     });
 }
 

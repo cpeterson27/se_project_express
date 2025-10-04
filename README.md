@@ -1,6 +1,17 @@
 # WTWR (What to Wear?): Back End
 
-The back-end project is focused on creating a server for the WTWR application. You’ll gain a deeper understanding of how to work with databases, set up security and testing, and deploy web applications on a remote machine. The eventual goal is to create a server with an API and authorization.
+This is a back-end project that is the core server-side component of the What to wear project. The responsibilities are:
+
+- exposing a RESTful API for the front / end clients
+- retrieving and persisting data in the MongoDB database
+- manages user accounts and authentication
+- enforces security measures such as validation and CORS
+- running automated tests
+
+## Features
+- user profiles: get/update profile data
+- CRUD (create, read, update, delete)
+- error handling & validation: input validation & standard error responses
 
 ## Running the Project
 

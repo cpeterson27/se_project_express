@@ -16,7 +16,7 @@ const getUsers = (req, res) => {
       console.error(err);
   return res
   .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-  .send({ message: err.message });
+  .send({ message: "An error has occured on the server" });
 });
 };
 
@@ -38,7 +38,7 @@ const createUser = (req, res) => {
       }
       return res
       .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-      .send({ message: err.message });
+      .send({ message: "An error has occured on the server" });
     });
 };
 
@@ -65,7 +65,7 @@ const createUser = (req, res) => {
         }
         return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occured on the server" });
       });
 };
 
