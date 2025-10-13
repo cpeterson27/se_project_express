@@ -43,7 +43,7 @@ app.patch("/users/me", updateUser);
 app.post("/items", createItem);
 app.delete("/items/:itemId", deleteItem);
 
-app.use(likesRouter);
+app.use("/items", likesRouter);
 
 app.listen(PORT, () => {});
 
