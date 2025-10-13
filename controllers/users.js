@@ -17,9 +17,15 @@ const { JWT_SECRET } = require("../utils/config");
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  User.findUserByCredentials(email, password)
+  if (!email || !password) {
+    return res.status(BAD_REQUEST_STATUS_CODE).send
+    ({ message: "Email and password are required"
+
+    });
+  }
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      // Create a token
         const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
           expiresIn: "7d",
         });
@@ -79,9 +85,13 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
+if (!email) {
+    return res.status(BAD_REQUEST_STATUS_CODE).send({
+      message: "Email is required"
+    });
+  }
 
-
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
         name,
@@ -116,6 +126,7 @@ const createUser = (req, res) => {
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
   User.findById(userId)
+  .select("-password")
     .orFail()
     .then((user) => res.status(OK_STATUS_CODE).send(user))
     .catch((err) => {

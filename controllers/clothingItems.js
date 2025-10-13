@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST_STATUS_CODE,
@@ -66,22 +67,35 @@ const getItem = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
-    const { itemId } = req.params;
-    const userId = req.user._id;
+  const { itemId } = req.params;
+  const userId = req.user._id;
 
-ClothingItem.findByIdAndDelete(itemId)
-  .orFail()
-  .then((item) => {
-    if (item.owner.toString() !== userId) {
-      return res
-        .status(ACCESS_DENIED_STATUS_CODE)
-        .send({ message: "Access denied" });
+  if (!mongoose.Types.ObjectId.isValid(itemId)) {
+    return res.status(BAD_REQUEST_STATUS_CODE).send({
+      message: "Invalid item ID format"
+    });
   }
-return ClothingItem.findByIdAndDelete(itemId)
-.then(() =>
-    res
-    .status(OK_STATUS_CODE)
-    .send({ message: "Item deleted" }))
+
+  // First, FIND the item (don't delete yet)
+  return ClothingItem.findById(itemId)
+    .orFail()
+    .then((item) => {
+      // Check ownership
+      if (item.owner.toString() !== userId) {
+        return res
+          .status(ACCESS_DENIED_STATUS_CODE)
+          .send({ message: "Access denied" });
+      }
+      // NOW delete it
+      return ClothingItem.findByIdAndDelete(itemId);
+    })
+    .then((deletedItem) => {
+      if (deletedItem) {
+        return res.status(OK_STATUS_CODE).send({
+          message: "Item deleted"
+        });
+      }
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === 'DocumentNotFoundError') {
@@ -91,13 +105,12 @@ return ClothingItem.findByIdAndDelete(itemId)
       }
       if (err.name === "CastError") {
         return res
-        .status(BAD_REQUEST_STATUS_CODE)
-        .send({ message: "Invalid format" });
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: "Invalid item ID format" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: "An error has occured on the server" });
+        .send({ message: "An error has occurred on the server" });
     });
-})
-}
+};
 module.exports = { getItems, createItem, getItem, deleteItem };
