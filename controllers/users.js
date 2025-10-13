@@ -109,11 +109,11 @@ const createUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: "Invalid Email" });
+          .send({ message: "Validation Failed" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: "An error has occured on the server" });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
