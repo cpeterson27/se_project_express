@@ -76,28 +76,26 @@ const deleteItem = (req, res) => {
     });
   }
 
-  // First, FIND the item (don't delete yet)
   return ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      // Check ownership
       if (item.owner.toString() !== userId) {
         return res
           .status(ACCESS_DENIED_STATUS_CODE)
           .send({ message: "Access denied" });
       }
-      // NOW delete it
       return ClothingItem.findByIdAndDelete(itemId);
     })
-    .then((deletedItem) => {
-      if (deletedItem) {
-        return res.status(OK_STATUS_CODE).send({
+    .then(() => res.status(OK_STATUS_CODE).send({
           message: "Item deleted"
-        });
-      }
-    })
+        }))
     .catch((err) => {
       console.error(err);
+      if (err.message === "Access denied") {
+        return res.status(ACCESS_DENIED_STATUS_CODE).send({
+          message: "Access denied"
+        });
+      }
       if (err.name === 'DocumentNotFoundError') {
         return res
           .status(NOT_FOUND_STATUS_CODE)
