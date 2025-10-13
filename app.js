@@ -7,6 +7,8 @@ const { createUser } = require("./controllers/users");
 const { login } = require("./controllers/users");
 const auth = require("./middlewares/auth");
 
+const { getItems } = require("./controllers/clothingItems");
+
 const { PORT = 3001 } = process.env;
 const app = express();
 
@@ -22,6 +24,8 @@ app.use(express.json());
 
 app.post('/signin', login);
 app.post('/signup', createUser);
+
+app.get('items', getItems)
 
 app.use(auth);
 

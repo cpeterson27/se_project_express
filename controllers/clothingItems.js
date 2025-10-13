@@ -5,6 +5,7 @@ const {
   INTERNAL_SERVER_ERROR_STATUS_CODE,
   CREATED_STATUS_CODE,
   OK_STATUS_CODE,
+  ACCESS_DENIED_STATUS_CODE
 } = require("../utils/errors");
 
 const getItems = (req, res) => {
@@ -73,14 +74,14 @@ ClothingItem.findByIdAndDelete(itemId)
   .then((item) => {
     if (item.owner.toString() !== userId) {
       return res
-        .status(403)
+        .status(ACCESS_DENIED_STATUS_CODE)
         .send({ message: "Access denied" });
   }
 return ClothingItem.findByIdAndDelete(itemId)
 .then(() =>
     res
     .status(OK_STATUS_CODE)
-    .send(item))
+    .send({ message: "Item deleted" }))
     .catch((err) => {
       console.error(err);
       if (err.name === 'DocumentNotFoundError') {
