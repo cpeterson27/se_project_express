@@ -78,18 +78,27 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
+  console.log('Received avatar:', avatar);
+
   bcrypt
     .hash(password, 10)
-    .then((hash) =>
-      User.create({
+    .then((hash) => {
+      console.log('Creating user with avatar:', avatar); // Log this
+      return User.create({
         name,
         avatar,
         email,
         password: hash,
-      })
-    )
-    .then((user) => User.findById(user._id).select("-password"))
-    .then((userWithoutPassword) => res.status(CREATED_STATUS_CODE).send(userWithoutPassword))
+      });
+    })
+    .then((user) => {
+      console.log('Created user avatar:', user.avatar);
+      return User.findById(user._id).select("-password");
+    })
+    .then((userWithoutPassword) => {
+      console.log('Final avatar:', userWithoutPassword.avatar);
+      res.status(CREATED_STATUS_CODE).send(userWithoutPassword);
+    })
     .catch((err) => {
       console.error(err);
       if (err.code === 11000) {
@@ -100,7 +109,7 @@ const createUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: "Input validation" });
+          .send({ message: "Invalid Email" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
