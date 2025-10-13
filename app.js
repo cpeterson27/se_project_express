@@ -29,6 +29,7 @@ app.use((req, res, next) => {
 
 app.post("/signin", login);
 app.post("/signup", createUser);
+app.post("/users", createUser);
 app.get("/items", getItems);
 
 app.use(auth);
