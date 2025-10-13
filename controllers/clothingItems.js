@@ -66,9 +66,19 @@ const getItem = (req, res) => {
 
 const deleteItem = (req, res) => {
     const { itemId } = req.params;
+    const userId = req.user._id;
+
 ClothingItem.findByIdAndDelete(itemId)
   .orFail()
-    .then((item) => res
+  .then((item) => {
+    if (item.owner.toString() !== userId) {
+      return res
+        .status(403)
+        .send({ message: "Access denied" });
+  }
+return ClothingItem.findByIdAndDelete(itemId)
+.then(() =>
+    res
     .status(OK_STATUS_CODE)
     .send(item))
     .catch((err) => {
@@ -87,6 +97,6 @@ ClothingItem.findByIdAndDelete(itemId)
         .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
         .send({ message: "An error has occured on the server" });
     });
+})
 }
-
 module.exports = { getItems, createItem, getItem, deleteItem };
