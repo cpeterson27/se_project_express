@@ -12,6 +12,7 @@ const { getItems } = require("./controllers/clothingItems");
 const { PORT = 3001 } = process.env;
 const app = express();
 
+mongoose.set("strictQuery", false);
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {
@@ -24,7 +25,7 @@ app.use(express.json());
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.get('items', getItems)
+app.get('/items', getItems)
 
 app.use(auth);
 
