@@ -18,7 +18,6 @@ itemId,
     .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
-      console.log(err.name);
       if (err.name === 'ValidationError') {
         return res
         .status(BAD_REQUEST_STATUS_CODE)
@@ -49,7 +48,6 @@ module.exports.dislikeItem = (req, res) => {
     .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
-      console.log(err.name);
       if (err.name === 'ValidationError') {
         return res
         .status(BAD_REQUEST_STATUS_CODE)

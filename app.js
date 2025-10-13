@@ -15,7 +15,6 @@ const app = express();
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {
-    console.log("Connected to MongoDB");
   })
   .catch(console.error);
 
@@ -34,5 +33,4 @@ app.use(likesRouter);
 app.use("/", mainRouter); // GET POST DELETE PATCH etc....
 
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
 });

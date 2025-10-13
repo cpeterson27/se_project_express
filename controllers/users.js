@@ -1,4 +1,6 @@
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+
 const User = require("../models/user");
 const {
   BAD_REQUEST_STATUS_CODE,
@@ -9,7 +11,6 @@ const {
   CONFLICT_STATUS_CODE,
   UNAUTHORIZED_STATUS_CODE
 } = require("../utils/errors");
-const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 
 // Login route to generate a JWT token
@@ -78,25 +79,18 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  console.log('Received avatar:', avatar);
+
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => {
-      console.log('Creating user with avatar:', avatar); // Log this
-      return User.create({
+    .then((hash) => User.create({
         name,
         avatar,
         email,
         password: hash,
-      });
-    })
-    .then((user) => {
-      console.log('Created user avatar:', user.avatar);
-      return User.findById(user._id).select("-password");
-    })
+      }))
+    .then((user) => User.findById(user._id).select("-password"))
     .then((userWithoutPassword) => {
-      console.log('Final avatar:', userWithoutPassword.avatar);
       res.status(CREATED_STATUS_CODE).send(userWithoutPassword);
     })
     .catch((err) => {
