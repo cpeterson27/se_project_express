@@ -1,12 +1,16 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const mainRouter = require("./routes/index");
 const likesRouter = require("./routes/likes");
 const { createUser } = require("./controllers/users");
 const { login } = require("./controllers/users");
 const auth = require("./middlewares/auth");
 const { getItems } = require("./controllers/clothingItems");
+const { createItem } = require("./controllers/clothingItems");
+const { deleteItem } = require("./controllers/clothingItems");
+const { getCurrentUser } = require("./controllers/users");
+
+const { updateUser } = require("./controllers/users");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -33,8 +37,13 @@ app.post("/users", createUser);
 app.get("/items", getItems);
 
 app.use(auth);
+
+app.get("/users/me", getCurrentUser);
+app.patch("/users/me", updateUser);
+app.post("/items", createItem);
+app.delete("/items/:itemId", deleteItem);
+
 app.use(likesRouter);
-app.use("/", mainRouter);
 
 app.listen(PORT, () => {});
 
