@@ -26,17 +26,9 @@ app.use(express.json());
 
 app.post("/signin", login);
 app.post("/signup", createUser);
-app.post("/users", createUser);
 app.get("/items", getItems);
 
 app.use(auth);
-
-app.use((req, res, next) => {
-  req.user = {
-   _id: "5d8b8592978f8bd833ca8133"
-  };
-  next();
-});
 
 app.get("/users/me", getCurrentUser);
 app.patch("/users/me", updateUser);
