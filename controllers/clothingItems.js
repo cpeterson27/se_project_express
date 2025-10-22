@@ -1,114 +1,137 @@
 const mongoose = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
 const {
-  BAD_REQUEST_STATUS_CODE,
-  NOT_FOUND_STATUS_CODE,
-  INTERNAL_SERVER_ERROR_STATUS_CODE,
-  CREATED_STATUS_CODE,
-  OK_STATUS_CODE,
-  ACCESS_DENIED_STATUS_CODE
+  sendBadRequest,
+  sendNotFound,
+  sendInternalError,
+  sendCreate,
+  sendSuccess,
+  sendAccessDenied,
 } = require("../utils/errors");
 
-const getItems = (req, res) => {
-  ClothingItem.find({})
-    .then((items) => res.send(items))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: "An error has occured on the server" });
-    });
-};
+// CREATE - POST
+const createItem = async (req, res) => {
+  try {
+    const { name, weather, imageUrl } = req.body;
+    const owner = req.user._id;
 
-const createItem = (req, res) => {
-  const { name, weather, imageUrl } = req.body;
-  const owner = req.user._id;
-
-  ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => res
-    .status(CREATED_STATUS_CODE)
-    .send(item))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: "Input validation" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: "An error has occured on the server" });
-    });
-};
-
-const getItem = (req, res) => {
-  const { itemId } = req.params;
-  ClothingItem.findById(itemId)
-  .orFail()
-    .then((item) => res
-    .status(OK_STATUS_CODE)
-    .send(item))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: "Item not found" });
-      }
-      if (err.name === "CastError") {
-        return res
-        .status(BAD_REQUEST_STATUS_CODE)
-        .send({ message: "Invalid format" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: "An error has occured on the server" });
-    });
-};
-
-const deleteItem = (req, res) => {
-  const { itemId } = req.params;
-  const userId = req.user._id;
-
-  if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(BAD_REQUEST_STATUS_CODE).send({
-      message: "Invalid item ID format"
-    });
+    const item = await ClothingItem.create({ name, weather, imageUrl, owner });
+    return sendCreate(res, item.toJSON());
+  } catch (err) {
+    console.error(err);
+    if (err.name === "ValidationError") {
+      return sendBadRequest(res, "Validation Failed");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
   }
-
-  return ClothingItem.findById(itemId)
-    .orFail()
-    .then((item) => {
-      if (item.owner.toString() !== userId) {
-        return res
-          .status(ACCESS_DENIED_STATUS_CODE)
-          .send({ message: "Access denied" });
-      }
-      return ClothingItem.findByIdAndDelete(itemId);
-    })
-    .then(() => res.status(OK_STATUS_CODE).send({
-          message: "Item deleted"
-        }))
-    .catch((err) => {
-      console.error(err);
-      if (err.message === "Access denied") {
-        return res.status(ACCESS_DENIED_STATUS_CODE).send({
-          message: "Access denied"
-        });
-      }
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: "Item not found" });
-      }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: "Invalid item ID format" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: "An error has occurred on the server" });
-    });
 };
-module.exports = { getItems, createItem, getItem, deleteItem };
+
+// READ - GET
+const getItems = async (req, res) => {
+  try {
+    const items = await ClothingItem.find({ owner: req.user._id })
+    return res.status(200).send(items);
+  } catch (err) {
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return sendNotFound(res, "Item not found");
+    }
+    if (err.name === "CastError") {
+      return sendBadRequest(res, "Invalid item ID format");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
+  }
+};
+
+// READ - GET
+const getItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await ClothingItem.findById(id).orFail().lean();
+
+    const userId = req.user._id;
+    if (item.owner.toString() !== userId) {
+      return sendAccessDenied(res, "Access denied");
+    }
+    return sendSuccess(res, item);
+  } catch (err) {
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return sendNotFound(res, "Item not found");
+    }
+    if (err.name === "CastError") {
+      return sendBadRequest(res, "Invalid item ID format");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
+  }
+};
+
+// UPDATE - PATCH
+const updateItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, weather, imageUrl } = req.body;
+    const userId = req.user._id;
+
+    const item = await ClothingItem.findById(id).orFail().lean();
+
+    if (item.owner.toString() !== userId) {
+      return sendAccessDenied(res, "Access denied");
+    }
+
+    const updatedItem = await ClothingItem.findByIdAndUpdate(
+      id,
+      { name, weather, imageUrl },
+      { new: true, runValidators: true }
+    )
+      .orFail()
+      .lean();
+    return sendSuccess(res, updatedItem);
+  } catch (err) {
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return sendNotFound(res, "Item not found");
+    }
+    if (err.name === "ValidationError") {
+      return sendBadRequest(res, "Validation Failed");
+    }
+    if (err.name === "CastError") {
+      return sendBadRequest(res, "Invalid item ID format");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
+  }
+};
+
+// DELETE - DELETE
+const deleteItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return sendBadRequest(res, "Invalid item ID format");
+    }
+
+    const item = await ClothingItem.findById(id)
+    .orFail()
+    .lean();
+
+    if (item.owner.toString() !== userId) {
+      return sendAccessDenied(res, "Access denied");
+    }
+    const deletedItem = await ClothingItem.findByIdAndDelete(id)
+    .lean();
+
+    return sendSuccess(res, deletedItem);
+  } catch (err) {
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return sendNotFound(res, "Item not found");
+    }
+    if (err.name === "CastError") {
+      return sendBadRequest(res, "Invalid item ID format");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
+  }
+};
+module.exports = { getItems, createItem, getItem, deleteItem, updateItem };

@@ -1,13 +1,17 @@
-const router = require('express').Router();
-const { getItems, createItem, getItem, deleteItem } = require('../controllers/clothingItems');
-const { likeItem, dislikeItem } = require('../controllers/likes');
+const clothingItemsRouter = require('express').Router();
+const auth = require('../middlewares/auth');
 
-router.get('/', getItems);
-router.get('/:itemId', getItem);
-router.post('/', createItem);
-router.delete('/:itemId', deleteItem )
+const { getItems, createItem, getItem, deleteItem, updateItem } = require('../controllers/clothingItems');
+const { likeItem, dislikeItem, getItemLikes } = require('../controllers/likes');
 
-router.put('/:itemId/likes', likeItem);
-router.delete('/:itemId/likes', dislikeItem);
+clothingItemsRouter.put('/:id/likes', auth, likeItem);
+clothingItemsRouter.delete('/:id/likes', auth, dislikeItem);
+clothingItemsRouter.get('/:id/likes', auth, getItemLikes);
 
-module.exports = router;
+clothingItemsRouter.get('/', auth, getItems);
+clothingItemsRouter.post('/', auth, createItem);
+clothingItemsRouter.delete('/:id', auth, deleteItem);
+clothingItemsRouter.patch('/:id', auth, updateItem);
+clothingItemsRouter.get('/:id', auth, getItem);
+
+module.exports = clothingItemsRouter;

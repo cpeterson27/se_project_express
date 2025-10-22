@@ -1,66 +1,107 @@
+const mongoose = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
 const {
-  INTERNAL_SERVER_ERROR_STATUS_CODE,
-  BAD_REQUEST_STATUS_CODE,
-  NOT_FOUND_STATUS_CODE,
+  sendInternalError,
+  sendBadRequest,
+  sendNotFound,
 } = require("../utils/errors");
 
-module.exports.likeItem = (req, res) => {
-  const { itemId } = req.params;
-  const userId = req.user._id;
+// CREATE - Add a like (like an item)
+module.exports.likeItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
 
-ClothingItem.findByIdAndUpdate(
-itemId,
-{ $addToSet: { likes: userId }},
-{new: true}
-)
-.orFail()
-    .then((items) => res.send(items))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === 'ValidationError') {
-        return res
-        .status(BAD_REQUEST_STATUS_CODE)
-        .send({message: "Invalid data"});
-      } if (err.name === 'DocumentNotFoundError') {
-        return res
-        .status(NOT_FOUND_STATUS_CODE)
-        .send({message: "Item not found"});
-      } if (err.name === 'CastError') {
-        return res
-        .status(BAD_REQUEST_STATUS_CODE)
-        .send({message: "Invalid item ID"});
-      }
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return sendBadRequest(res, "Invalid ID format");
+    }
 
-        return res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({message: "Something went wrong"});
-    });
-  };
+    // Convert userId to ObjectId if it's a string
+    const userObjectId = typeof userId === 'string'
+      ? new mongoose.Types.ObjectId(userId)
+      : userId;
 
-module.exports.dislikeItem = (req, res) => {
-  ClothingItem.findByIdAndUpdate(
-    req.params.itemId,
-    { $pull: { likes: req.user._id } },
-    { new: true }
-  )
-  .orFail()
-    .then((items) => res.send(items))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === 'ValidationError') {
-        return res
-        .status(BAD_REQUEST_STATUS_CODE)
-        .send({message: "Invalid data"});
-      } if (err.name === 'DocumentNotFoundError') {
-        return res
-        .status(NOT_FOUND_STATUS_CODE)
-        .send({message: "Item not found"});
-      } if (err.name === 'CastError') {
-        return res
-        .status(BAD_REQUEST_STATUS_CODE)
-        .send({message: "Invalid item ID"});
-      }
-        return res.status(INTERNAL_SERVER_ERROR_STATUS_CODE).send({message: "Something went wrong"});
-    });
+    const item = await ClothingItem.findByIdAndUpdate(
+      id,
+      { $addToSet: { likes: userObjectId } },
+      { new: true }
+    )
+      .orFail()
+      .lean();
+
+    return res.status(200).send(item);
+  } catch (err) {
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return sendNotFound(res, "Item not found");
+    }
+    if (err.name === "CastError") {
+      return sendBadRequest(res, "Invalid ID format");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
   }
+};
+
+// READ - Get all users who liked an item
+module.exports.getItemLikes = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return sendBadRequest(res, "Invalid ID format");
+    }
+
+    const item = await ClothingItem.findById(id)
+      .select("likes")
+      .populate("likes", "name avatar")
+      .orFail()
+      .lean();
+
+    return res.status(200).send(item.likes);
+  } catch (err) {
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return sendNotFound(res, "Item not found");
+    }
+    if (err.name === "CastError") {
+      return sendBadRequest(res, "Invalid ID format");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
+  }
+};
+
+// DELETE - Remove a like (unlike an item)
+module.exports.dislikeItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return sendBadRequest(res, "Invalid ID format");
+    }
+
+    // Convert userId to ObjectId if it's a string
+    const userObjectId = typeof userId === 'string'
+      ? new mongoose.Types.ObjectId(userId)
+      : userId;
+
+    const item = await ClothingItem.findByIdAndUpdate(
+      id,
+      { $pull: { likes: userObjectId } },
+      { new: true }
+    )
+      .orFail()
+      .lean();
+
+    return res.status(200).send(item);
+  } catch (err) {
+    console.error(err);
+    if (err.name === "DocumentNotFoundError") {
+      return sendNotFound(res, "Item not found");
+    }
+    if (err.name === "CastError") {
+      return sendBadRequest(res, "Invalid ID format");
+    }
+    return sendInternalError(res, "An error has occurred on the server");
+  }
+};

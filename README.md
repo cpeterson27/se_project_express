@@ -9,7 +9,7 @@ This is a back-end project that is the core server-side component of the What to
 - running automated tests
 
 ## Project Pitch Video
-Check out [this video](https://www.loom.com/share/d39bb26e13bf4a0682c5dd126f04a507?sid=387c6b64-2130-4a1b-a2ce-e28372e948ec
+Check out [this video](https://www.loom.com/share/ef71d7ece709405cb0343362c55ea5fe?sid=9991e51f-4e70-4d2f-bcb4-dbdce3c5e909
 ), where I describe my 
  project and some challenges I faced while building it.
 
