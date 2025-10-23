@@ -1,7 +1,7 @@
 const clothingItemsRouter = require('express').Router();
 const auth = require('../middlewares/auth');
 
-const { getItems, createItem, getItem, deleteItem, updateItem } = require('../controllers/clothingItems');
+const { getItems, createItem, getItem, deleteItem } = require('../controllers/clothingItems');
 const { likeItem, dislikeItem, getItemLikes } = require('../controllers/likes');
 
 clothingItemsRouter.put('/:id/likes', auth, likeItem);
