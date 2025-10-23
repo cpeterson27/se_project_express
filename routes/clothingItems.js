@@ -8,10 +8,9 @@ clothingItemsRouter.put('/:id/likes', auth, likeItem);
 clothingItemsRouter.delete('/:id/likes', auth, dislikeItem);
 clothingItemsRouter.get('/:id/likes', auth, getItemLikes);
 
-clothingItemsRouter.get('/', auth, getItems);
+clothingItemsRouter.get('/', getItems);
 clothingItemsRouter.post('/', auth, createItem);
 clothingItemsRouter.delete('/:id', auth, deleteItem);
-clothingItemsRouter.patch('/:id', auth, updateItem);
 clothingItemsRouter.get('/:id', auth, getItem);
 
 module.exports = clothingItemsRouter;

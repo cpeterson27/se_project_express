@@ -7,7 +7,6 @@ const {
   sendNotFound,
   sendInternalError,
   sendCreate,
-  sendSuccess,
   sendConflict,
   sendUnauthorized,
 } = require("../utils/errors");
@@ -109,22 +108,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-// DELETE - DELETE
-const deleteUser = async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    await User.findByIdAndDelete(userId).orFail();
-    return sendSuccess(res, null, "User deleted successfully");
-  } catch (err) {
-    console.error(err);
-    if (err.name === "DocumentNotFoundError") {
-      return sendNotFound(res, "User not found");
-    }
-    return sendInternalError(res, "An error has occurred on the server");
-  }
-};
-
 // LOGIN - POST
 const login = async (req, res) => {
   try {
@@ -148,4 +131,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getCurrentUser, login, updateUser, deleteUser };
+module.exports = { createUser, getCurrentUser, login, updateUser };

@@ -29,7 +29,7 @@ const createItem = async (req, res) => {
 // READ - GET
 const getItems = async (req, res) => {
   try {
-    const items = await ClothingItem.find({ owner: req.user._id })
+    const items = await ClothingItem.find()
     return res.status(200).send(items);
   } catch (err) {
     console.error(err);

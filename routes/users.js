@@ -5,6 +5,6 @@ const { createUser, login, getCurrentUser, updateUser } = require('../controller
 usersRouter.get('/users/me', auth, getCurrentUser);
 usersRouter.post('/signup', createUser);
 usersRouter.post('/signin', login);
-usersRouter.patch("/users/me", auth, updateUser);
+usersRouter.patch("/me", auth, updateUser);
 
 module.exports = usersRouter;
