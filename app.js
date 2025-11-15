@@ -19,10 +19,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/items", clothingItemsRouter);
-app.use("/", usersRouter);
+app.use("/users", usersRouter);
 
 app.use((req, res) => {
-res.status(sendNotFound).json({message: "Requested resource not found"});
+sendNotFound(res, "Requested resource not found");
 });
 
 app.listen(PORT, () => {});

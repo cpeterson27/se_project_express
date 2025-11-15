@@ -109,7 +109,7 @@ const updateUser = async (req, res) => {
 };
 
 // LOGIN - POST
-const login = async (req, res) => {
+const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -131,4 +131,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getCurrentUser, login, updateUser };
+module.exports = { createUser, getCurrentUser, loginUser, updateUser };
