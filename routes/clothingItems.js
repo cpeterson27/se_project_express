@@ -2,16 +2,16 @@ const clothingItemsRouter = require('express').Router();
 const auth = require('../middlewares/auth');
 const { validateClothingItem, validateId } = require('../middlewares/validation');
 
-const { getItems, createItem, getItem, deleteItem } = require('../controllers/clothingItems');
-const { likeItem, dislikeItem, getItemLikes } = require('../controllers/likes');
+const { getItemList, createItem, getItem, removeItem } = require('../controllers/clothingItems');
+const { addCardLike, removeCardLike, getItemLikes } = require('../controllers/likes');
 
-clothingItemsRouter.put('/:id/likes', auth, validateId, likeItem);
-clothingItemsRouter.delete('/:id/likes', auth, validateId, dislikeItem);
+clothingItemsRouter.put('/:id/likes', auth, validateId, addCardLike);
+clothingItemsRouter.delete('/:id/likes', auth, validateId, removeCardLike);
 clothingItemsRouter.get('/:id/likes', auth, validateId, getItemLikes);
 
-clothingItemsRouter.get('/', getItems);
+clothingItemsRouter.get('/', getItemList);
 clothingItemsRouter.post('/', auth, validateClothingItem, createItem);
-clothingItemsRouter.delete('/:id', auth, validateId, deleteItem);
+clothingItemsRouter.delete('/:id', auth, validateId, removeItem);
 clothingItemsRouter.get('/:id', auth, validateId, getItem);
 
 module.exports = clothingItemsRouter;

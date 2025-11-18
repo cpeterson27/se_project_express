@@ -14,7 +14,7 @@ const { JWT_SECRET } = require("../utils/config");
 
 // CREATE - POST
 
-const createUser = async (req, res) => {
+const register = async (req, res) => {
   try {
     const { name, avatar, email, password } = req.body;
 
@@ -78,7 +78,7 @@ const getCurrentUser = async (req, res) => {
 };
 
 // UPDATE - PATCH
-const updateUser = async (req, res) => {
+const updateUserInfo = async (req, res) => {
   try {
     const userId = req.user._id;
     const { name, avatar } = req.body;
@@ -109,7 +109,7 @@ const updateUser = async (req, res) => {
 };
 
 // LOGIN - POST
-const loginUser = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -131,4 +131,4 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getCurrentUser, loginUser, updateUser };
+module.exports = { register, getCurrentUser, login, updateUserInfo };

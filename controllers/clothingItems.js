@@ -27,7 +27,7 @@ const createItem = async (req, res) => {
 };
 
 // READ - GET
-const getItems = async (req, res) => {
+const getItemList = async (req, res) => {
   try {
     const items = await ClothingItem.find()
     return res.status(200).send(items);
@@ -103,7 +103,7 @@ const updateItem = async (req, res) => {
 };
 
 // DELETE - DELETE
-const deleteItem = async (req, res) => {
+const removeItem = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id;
@@ -134,4 +134,4 @@ const deleteItem = async (req, res) => {
     return sendInternalError(res, "An error has occurred on the server");
   }
 };
-module.exports = { getItems, createItem, getItem, deleteItem, updateItem };
+module.exports = { getItemList, createItem, getItem, removeItem, updateItem };

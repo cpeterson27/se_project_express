@@ -7,7 +7,7 @@ const {
 } = require("../utils/errors");
 
 // CREATE - Add a like (like an item)
-module.exports.likeItem = async (req, res) => {
+module.exports.addCardLike = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id;
@@ -71,7 +71,7 @@ module.exports.getItemLikes = async (req, res) => {
 };
 
 // DELETE - Remove a like (unlike an item)
-module.exports.dislikeItem = async (req, res) => {
+module.exports.removeCardLike = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id;
