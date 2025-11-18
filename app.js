@@ -6,6 +6,7 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const clothingItemsRouter = require("./routes/clothingItems");
 const usersRouter = require("./routes/users");
 const { sendNotFound } = require("./utils/errors");
+require("dotenv").config();
 
 const { PORT = 3001 } = process.env;
 const app = express();

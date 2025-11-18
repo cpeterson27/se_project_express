@@ -1,3 +1,3 @@
-const JWT_SECRET = "06b7e057b263cfd83b05598d110ad479f02fe7a09f4f40d318829d22a3bf80c6ab19d774d5d936462a18e04876caa04df408134bb873b69950b231047a6d1d5c"
+const {JWT_SECRET = 'dev-secret'} = process.env;
 
 module.exports = {JWT_SECRET}
