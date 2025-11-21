@@ -1,52 +1,71 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const {errors} = require("celebrate");
+const { errors: celebrateErrors, isCelebrateError } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const clothingItemsRouter = require("./routes/clothingItems");
 const usersRouter = require("./routes/users");
 const { sendNotFound } = require("./utils/errors");
 require("dotenv").config();
+const { MONGODB_URI } = process.env;
 
 const { PORT = 3001 } = process.env;
 const app = express();
 
 mongoose.set("strictQuery", false);
 mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {})
-  .catch(console.error);
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log('MongoDB connected successfully');
 
-app.use(cors());
+    app.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  });
+
+app.use(
+  cors({
+    origin:
+    process.env.NODE_ENV === 'production'
+      ? 'https://wtwr-app.chickenkiller.com'
+      : 'http://localhost:3000',
+  })
+  );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(requestLogger);
-
-app.use(errorLogger);
-
-app.use(errors());
-
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({
-    message:
-      statusCode === 500
-        ? "An internal server error occurred"
-        : message,
-  });
-  next();
-});
 
 app.use("/items", clothingItemsRouter);
 app.use("/users", usersRouter);
 
-
-
 app.use((req, res) => {
-sendNotFound(res, "Requested resource not found");
+  sendNotFound(res, "Requested resource not found");
 });
 
-app.listen(PORT, () => {});
+app.use((err, req, res, next) => {
+  if (isCelebrateError(err)) {
+    console.error("Validation error:", err);
+  }
+  next(err);
+});
+app.use(celebrateErrors());
+
+app.use(errorLogger);
+
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || err.status || 500;
+  const message =
+    statusCode === 500
+      ? "An internal server error occurred"
+      : err.message;
+
+  res.status(statusCode).send({ message });
+
+  next();
+});
 
 module.exports = app;
