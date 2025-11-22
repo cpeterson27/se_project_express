@@ -18,7 +18,7 @@ const register = async (req, res) => {
   try {
     const { name, avatar, email, password } = req.body;
 
-    console.log('Registration attempt:', { name, email, avatar }); // Debug log
+    console.log("Registration attempt:", { name, email, avatar }); // Debug log
 
     if (!email) {
       return sendBadRequest(res, "Email is required");
@@ -30,7 +30,7 @@ const register = async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log('User already exists:', email); // Debug log
+      console.log("User already exists:", email); // Debug log
       return sendConflict(res, "Email already exists");
     }
 
@@ -42,7 +42,7 @@ const register = async (req, res) => {
       password: hash,
     });
 
-    console.log('User created successfully:', user._id); // Debug log
+    console.log("User created successfully:", user._id);
 
     const userWithoutPassword = await User.findById(user._id)
       .select("-password")
@@ -50,7 +50,7 @@ const register = async (req, res) => {
 
     return sendCreate(res, userWithoutPassword);
   } catch (err) {
-    console.error('Registration error:', err);
+    console.error("Registration error:", err);
     if (err.code === 11000) {
       return sendConflict(res, "Email already exists");
     }
@@ -129,7 +129,6 @@ const login = async (req, res) => {
     });
 
     return res.send({ token });
-
   } catch (err) {
     console.error(err);
     return sendUnauthorized(res, "Invalid email or password");

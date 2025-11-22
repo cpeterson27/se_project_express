@@ -29,19 +29,26 @@ const createItem = async (req, res) => {
 // READ - GET
 const getItemList = async (req, res) => {
   try {
-    const items = await ClothingItem.find()
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return sendBadRequest(res, "User ID missing or not authenticated");
+    }
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return sendBadRequest(res, "Invalid user ID format");
+    }
+
+    const ownerObjectId = new mongoose.Types.ObjectId(userId);
+
+    const items = await ClothingItem.find({ owner: ownerObjectId }).lean();
+    console.log("getItemList: found items for user", ownerObjectId, items);
+
     return res.status(200).send(items);
   } catch (err) {
-    console.error(err);
-    if (err.name === "DocumentNotFoundError") {
-      return sendNotFound(res, "Item not found");
-    }
-    if (err.name === "CastError") {
-      return sendBadRequest(res, "Invalid item ID format");
-    }
+    console.error("getItemList error:", err);
     return sendInternalError(res, "An error has occurred on the server");
   }
 };
+
 
 // READ - GET
 const getItem = async (req, res) => {
@@ -112,15 +119,12 @@ const removeItem = async (req, res) => {
       return sendBadRequest(res, "Invalid item ID format");
     }
 
-    const item = await ClothingItem.findById(id)
-    .orFail()
-    .lean();
+    const item = await ClothingItem.findById(id).orFail().lean();
 
     if (item.owner.toString() !== userId) {
       return sendAccessDenied(res, "Access denied");
     }
-    const deletedItem = await ClothingItem.findByIdAndDelete(id)
-    .lean();
+    const deletedItem = await ClothingItem.findByIdAndDelete(id).lean();
 
     return sendSuccess(res, deletedItem);
   } catch (err) {

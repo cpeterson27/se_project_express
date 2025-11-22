@@ -6,35 +6,21 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const clothingItemsRouter = require("./routes/clothingItems");
 const usersRouter = require("./routes/users");
 const { sendNotFound } = require("./utils/errors");
+
+// eslint-disable-next-line import/no-extraneous-dependencies
 require("dotenv").config();
-const { MONGODB_URI } = process.env;
 
 const { PORT = 3001 } = process.env;
 const app = express();
 
-mongoose.set("strictQuery", false);
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log('MongoDB connected successfully');
-
-    app.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
-  });
-
 app.use(
   cors({
     origin:
-    process.env.NODE_ENV === 'production'
-      ? 'https://wtwr-app.chickenkiller.com'
-      : 'http://localhost:3000',
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONEND_URL
+        : "http://localhost:3000",
   })
-  );
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
@@ -59,13 +45,29 @@ app.use(errorLogger);
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || err.status || 500;
   const message =
-    statusCode === 500
-      ? "An internal server error occurred"
-      : err.message;
+    statusCode === 500 ? "An internal server error occurred" : err.message;
 
   res.status(statusCode).send({ message });
 
   next();
 });
+
+mongoose.set("strictQuery", false);
+
+mongoose
+  .connect(
+    "mongodb+srv://cgdesigns93_db_user:Superfam1%21@sparklebows.0ogrl7x.mongodb.net/wtwr?retryWrites=true&w=majority&appName=sparklebows"
+  )
+  .then(() => {
+    console.log("MongoDB connected successfully");
+
+    app.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
+  });
 
 module.exports = app;
