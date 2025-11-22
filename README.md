@@ -1,5 +1,9 @@
 # WTWR (What to Wear?): Back End
 
+api.wtwr-app.chickenkiller.com
+wtwr-app.chickenkiller.com
+www.wtwr-app.chickenkiller.com
+
 This is a back-end project that is the core server-side component of the What to wear project. The responsibilities are:
 
 - exposing a RESTful API for the front / end clients
@@ -9,11 +13,12 @@ This is a back-end project that is the core server-side component of the What to
 - running automated tests
 
 ## Project Pitch Video
-Check out [this video](https://www.loom.com/share/ef71d7ece709405cb0343362c55ea5fe?sid=15d5ef1f-cc2a-43e4-9626-f98dca8c6245
-), where I describe my 
- project and some challenges I faced while building it.
+
+Check out [this video](https://www.loom.com/share/ef71d7ece709405cb0343362c55ea5fe?sid=15d5ef1f-cc2a-43e4-9626-f98dca8c6245), where I describe my
+project and some challenges I faced while building it.
 
 ## Features
+
 - user profiles: get/update profile data
 - CRUD (create, read, update, delete)
 - error handling & validation: input validation & standard error responses

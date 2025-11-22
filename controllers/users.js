@@ -2,13 +2,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-const {
-  sendBadRequest,
-  sendNotFound,
-  sendInternalError,
+const {  
   sendCreate,
-  sendConflict,
-  sendUnauthorized,
+  BadRequestError,
+  ConflictError,
+  InternalServerError,
+  NotFoundError,
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -18,23 +17,27 @@ const register = async (req, res) => {
   try {
     const { name, avatar, email, password } = req.body;
 
-    console.log("Registration attempt:", { name, email, avatar }); // Debug log
+    console.log('=== REGISTRATION START ===');
+    console.log('Registration attempt:', { name, email, avatar });
 
     if (!email) {
-      return sendBadRequest(res, "Email is required");
+      throw new BadRequestError("Email is required");
     }
 
     if (!password) {
-      return sendBadRequest(res, "Password is required");
+      throw new BadRequestError("Password is required");
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log("User already exists:", email); // Debug log
-      return sendConflict(res, "Email already exists");
+      console.log('User already exists:', email);
+      throw new ConflictError("Email already exists");
     }
 
+    console.log('Hashing password...');
     const hash = await bcrypt.hash(password, 10);
+
+    console.log('Creating user in database...');
     const user = await User.create({
       name,
       avatar,
@@ -42,22 +45,25 @@ const register = async (req, res) => {
       password: hash,
     });
 
-    console.log("User created successfully:", user._id);
+    console.log('✅ User created successfully:', user._id);
+    console.log('User object:', JSON.stringify(user.toObject(), null, 2));
 
     const userWithoutPassword = await User.findById(user._id)
       .select("-password")
       .lean();
 
+    console.log('=== REGISTRATION COMPLETE ===');
     return sendCreate(res, userWithoutPassword);
   } catch (err) {
-    console.error("Registration error:", err);
+    console.error('❌ Registration error:', err);
+    console.error('Error stack:', err.stack);
     if (err.code === 11000) {
-      return sendConflict(res, "Email already exists");
+      throw new ConflictError("Email already exists");
     }
     if (err.name === "ValidationError") {
-      return sendBadRequest(res, "Validation Failed");
+      throw new BadRequestError("Validation Failed");
     }
-    return sendInternalError(res, "An error has occurred on the server");
+    throw new InternalServerError("An error has occurred on the server");
   }
 };
 
@@ -76,9 +82,9 @@ const getCurrentUser = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === "DocumentNotFoundError") {
-      return sendNotFound(res, "User not found");
+      throw new NotFoundError("User not found");
     }
-    return sendInternalError(res, "An error has occurred on the server");
+    throw new InternalServerError("An error has occurred on the server");
   }
 };
 
@@ -101,15 +107,15 @@ const updateUserInfo = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === "ValidationError") {
-      return sendBadRequest(res, "Validation Failed");
+      throw new BadRequestError("Validation Failed");
     }
     if (err.name === "DocumentNotFoundError") {
-      return sendNotFound(res, "User not found");
+      throw new NotFoundError("User not found");
     }
     if (err.name === "CastError") {
-      return sendBadRequest(res, "Invalid user ID format");
+      throw new BadRequestError("Invalid user ID format");
     }
-    return sendInternalError(res, "An error has occurred on the server");
+    throw new InternalServerError("An error has occurred on the server");
   }
 };
 
@@ -119,7 +125,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return sendBadRequest(res, "Email and password are required");
+      throw new BadRequestError("Email and password are required");
     }
 
     const user = await User.findUserByCredentials(email, password);
@@ -131,7 +137,7 @@ const login = async (req, res) => {
     return res.send({ token });
   } catch (err) {
     console.error(err);
-    return sendUnauthorized(res, "Invalid email or password");
+    throw new BadRequestError("Invalid email or password");
   }
 };
 

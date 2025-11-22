@@ -8,7 +8,6 @@ const {
 const {
   getItemList,
   createItem,
-  getItem,
   removeItem,
 } = require("../controllers/clothingItems");
 const {
@@ -24,6 +23,5 @@ clothingItemsRouter.get("/:id/likes", auth, validateId, getItemLikes);
 clothingItemsRouter.get("/", auth, getItemList);
 clothingItemsRouter.post("/", auth, validateClothingItem, createItem);
 clothingItemsRouter.delete("/:id", auth, validateId, removeItem);
-clothingItemsRouter.get("/:id", auth, validateId, getItem);
 
 module.exports = clothingItemsRouter;
