@@ -7,10 +7,9 @@ const clothingItemsRouter = require("./routes/clothingItems");
 const usersRouter = require("./routes/users");
 const { sendNotFound } = require("./utils/errors");
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 require("dotenv").config();
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3001, MONGODB_URI } = process.env;
 const app = express();
 
 app.use(
@@ -55,11 +54,11 @@ app.use((err, req, res, next) => {
 mongoose.set("strictQuery", false);
 
 mongoose
-  .connect(
-    "mongodb+srv://cgdesigns93_db_user:Superfam1%21@sparklebows.0ogrl7x.mongodb.net/wtwr?retryWrites=true&w=majority&appName=sparklebows"
-  )
+  .connect(MONGODB_URI || "mongodb+srv://cgdesigns93_db_user:Superfam1%21@sparklebows.0ogrl7x.mongodb.net/wtwr?retryWrites=true&w=majority")
   .then(() => {
     console.log("MongoDB connected successfully");
+    console.log("Connected to database:", mongoose.connection.name);
+    console.log("Connection host:", mongoose.connection.host);
 
     app.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}`);
