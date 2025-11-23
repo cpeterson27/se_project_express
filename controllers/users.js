@@ -52,7 +52,7 @@ const register = async (req, res) => {
       .lean();
 
     console.log('=== REGISTRATION COMPLETE ===');
-    return sendCreateResponse(res, userWithoutPassword);
+    return res.status(201).send(userWithoutPassword);
   } catch (err) {
     console.error('❌ Registration error:', err);
     console.error('Error stack:', err.stack);
