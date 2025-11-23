@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "./se_project_express/.env" });
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -10,31 +10,38 @@ const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 
 const { PORT = 3001, MONGODB_URI } = process.env;
+
 const app = express();
 
 app.use(cors({
   origin: process.env.NODE_ENV === "production"
     ? process.env.FRONTEND_URL
     : "http://localhost:3000",
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
-// ROUTES FIRST - BEFORE ANY 404 HANDLER
-app.use("/", authRouter);           // /signup, /signin
-app.use("/users", usersRouter);     // /users/me
-app.use("/items", clothingItemsRouter);  // /items/*
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Server will crash now');
+  }, 0);
+});
 
-// 404 HANDLER - MUST BE AFTER ALL ROUTES
+app.use("/", authRouter);
+app.use("/users", usersRouter);
+app.use("/items", clothingItemsRouter);
+
 app.use((req, res, next) => {
   const error = new Error("Requested resource not found");
   error.statusCode = 404;
   next(error);
 });
 
-// ERROR HANDLERS
 app.use((err, req, res, next) => {
   if (isCelebrateError(err)) {
     console.error("Validation error:", err);
@@ -51,22 +58,32 @@ app.use((err, req, res, next) => {
   res.status(statusCode).send({ message });
 });
 
-// MONGODB CONNECTION
 mongoose.set("strictQuery", false);
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log("MongoDB connected successfully");
-    console.log("Connected to database:", mongoose.connection.name);
-    console.log("Connection host:", mongoose.connection.host);
 
-    app.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
+const connectWithRetry = () => {
+  mongoose
+    .connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    })
+    .then(() => {
+      console.log("MongoDB connected successfully");
+      console.log("Connected to database:", mongoose.connection.name);
+      console.log("Connection host:", mongoose.connection.host);
+
+      app.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error("MongoDB connection error:", error);
+      console.log("Retrying connection in 5 seconds...");
+      setTimeout(connectWithRetry, 5000);
     });
-  })
-  .catch((error) => {
-    console.error("MongoDB connection error:", error);
-    process.exit(1);
-  });
+};
+
+connectWithRetry();
 
 module.exports = app;

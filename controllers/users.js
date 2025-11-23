@@ -2,8 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-const {  
-  sendCreate,
+const {
+  sendCreateResponse,
   BadRequestError,
   ConflictError,
   InternalServerError,
@@ -34,7 +34,6 @@ const register = async (req, res) => {
       throw new ConflictError("Email already exists");
     }
 
-    console.log('Hashing password...');
     const hash = await bcrypt.hash(password, 10);
 
     console.log('Creating user in database...');
@@ -53,7 +52,7 @@ const register = async (req, res) => {
       .lean();
 
     console.log('=== REGISTRATION COMPLETE ===');
-    return sendCreate(res, userWithoutPassword);
+    return sendCreateResponse(res, userWithoutPassword);
   } catch (err) {
     console.error('❌ Registration error:', err);
     console.error('Error stack:', err.stack);

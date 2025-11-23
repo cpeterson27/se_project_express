@@ -10,6 +10,7 @@ const {
   createItem,
   removeItem,
 } = require("../controllers/clothingItems");
+
 const {
   addCardLike,
   removeCardLike,
@@ -20,7 +21,7 @@ clothingItemsRouter.put("/:id/likes", auth, validateId, addCardLike);
 clothingItemsRouter.delete("/:id/likes", auth, validateId, removeCardLike);
 clothingItemsRouter.get("/:id/likes", auth, validateId, getItemLikes);
 
-clothingItemsRouter.get("/", auth, getItemList);
+clothingItemsRouter.get("/", getItemList);
 clothingItemsRouter.post("/", auth, validateClothingItem, createItem);
 clothingItemsRouter.delete("/:id", auth, validateId, removeItem);
 
