@@ -8,7 +8,7 @@ const {
 
 // CREATE - POST
 const createItem = async (req, res, next) => {
-  try{
+  try {
     const { name, weather, imageUrl } = req.body;
     const owner = req.user._id;
 
@@ -20,7 +20,7 @@ const createItem = async (req, res, next) => {
     }
     next(err);
   }
-}
+};
 
 // READ - GET
 const getItemList = async (req, res, next) => {
@@ -30,7 +30,7 @@ const getItemList = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 // DELETE - DELETE
 const removeItem = async (req, res, next) => {
@@ -57,6 +57,6 @@ const removeItem = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
 
 module.exports = { getItemList, createItem, removeItem };

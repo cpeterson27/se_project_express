@@ -3,11 +3,16 @@ require("dotenv").config({ path: "./.env" });
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
+const helmet = require('helmet');
+
 const { errors: celebrateErrors, isCelebrateError } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const clothingItemsRouter = require("./routes/clothingItems");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
+const limiter = require('./utils/rateLimiter');
+
 
 const { PORT = 3001, MONGODB_URI } = process.env;
 
@@ -22,6 +27,8 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(limiter);
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);

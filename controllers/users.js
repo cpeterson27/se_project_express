@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 const {
-  sendCreateResponse,
   BadRequestError,
   ConflictError,
   InternalServerError,
