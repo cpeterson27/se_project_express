@@ -13,10 +13,9 @@ module.exports.addCardLike = async (req, res, next) => {
     const userId = req.user._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestError("Invalid ID format");
+      return next (new BadRequestError("Invalid ID format"));
     }
 
-    // Convert userId to ObjectId if it's a string
     const userObjectId = typeof userId === 'string'
       ? new mongoose.Types.ObjectId(userId)
       : userId;
@@ -33,12 +32,12 @@ module.exports.addCardLike = async (req, res, next) => {
   } catch (err) {
     console.error(err);
     if (err.name === "DocumentNotFoundError") {
-      throw new NotFoundError("Item not found");
+      return next (new NotFoundError("Item not found"));
     }
     if (err.name === "CastError") {
-      throw new BadRequestError("Invalid ID format");
+      return next(new BadRequestError("Invalid ID format"));
     }
-    throw new InternalServerError("An error has occurred on the server");
+    return next(new InternalServerError("An error has occurred on the server"));
   }
 };
 
@@ -48,7 +47,7 @@ module.exports.getItemLikes = async (req, res, next) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestError("Invalid ID format");
+      return next (new BadRequestError("Invalid ID format"));
     }
 
     const item = await ClothingItem.findById(id)
@@ -61,12 +60,12 @@ module.exports.getItemLikes = async (req, res, next) => {
   } catch (err) {
     console.error(err);
     if (err.name === "DocumentNotFoundError") {
-      throw new NotFoundError("Item not found");
+      return next (new NotFoundError("Item not found"));
     }
     if (err.name === "CastError") {
-      throw new BadRequestError("Invalid ID format");
+      return next (new BadRequestError("Invalid ID format"));
     }
-    throw new InternalServerError("An error has occurred on the server");
+    return (new InternalServerError("An error has occurred on the server"));
   }
 };
 
@@ -77,7 +76,7 @@ module.exports.removeCardLike = async (req, res, next) => {
     const userId = req.user._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestError("Invalid ID format");
+      return next (new BadRequestError("Invalid ID format"));
     }
 
     // Convert userId to ObjectId if it's a string
@@ -97,11 +96,11 @@ module.exports.removeCardLike = async (req, res, next) => {
   } catch (err) {
     console.error(err);
     if (err.name === "DocumentNotFoundError") {
-      throw new NotFoundError("Item not found");
+      return next (new NotFoundError("Item not found"));
     }
     if (err.name === "CastError") {
-      throw new BadRequestError("Invalid ID format");
+      return next (new BadRequestError("Invalid ID format"));
     }
-    throw new InternalServerError("An error has occurred on the server");
+    return next (new InternalServerError("An error has occurred on the server"));
   }
 };

@@ -32,13 +32,6 @@ const validateUserBody = celebrate({
       avatar: Joi.string().custom(validateURL).messages({
         'string.uri': 'The "avatar" field must be a valid URL',
       }),
-      email: Joi.string().required().email().messages({
-        'string.email': 'The "email" field must be a valid email address',
-        'string.empty': 'The "email" field is required',
-      }),
-      password: Joi.string().required().messages({
-        'string.empty': 'The "password" field is required',
-      }),
     }),
   });
 

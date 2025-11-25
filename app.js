@@ -1,3 +1,5 @@
+import { NotFoundError } from "./utils/errors/NotFoundError";
+
 require("dotenv").config({ path: "./.env" });
 
 const express = require("express");
@@ -13,8 +15,7 @@ const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const limiter = require('./utils/rateLimiter');
 
-
-const { PORT = 3001, MONGODB_URI } = process.env;
+const { PORT = 3001, MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } = process.env;
 
 const app = express();
 
@@ -33,9 +34,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
-app.get('/crash-test', () => {
+app.get('/crash-test', (next) => {
   setTimeout(() => {
-    throw new Error('Server will crash now');
+   next (new Error('Server will crash now'));
   }, 0);
 });
 
@@ -43,23 +44,21 @@ app.use("/", authRouter);
 app.use("/users", usersRouter);
 app.use("/items", clothingItemsRouter);
 
-app.use((req, res, next) => {
-  const error = new Error("Requested resource not found");
-  error.statusCode = 404;
-  next(error);
+app.use((_req, _res, next) => {
+  next(new NotFoundError("Requested resource not found"));
 });
 
-app.use((err, req, res, next) => {
+app.use((err, _req, _res, next) => {
   if (isCelebrateError(err)) {
     console.error("Validation error:", err);
   }
   next(err);
 });
 
-app.use(celebrateErrors());
 app.use(errorLogger);
+app.use(celebrateErrors());
 
-app.use((err, req, res, next) => {
+app.use((err, _req, res) => {
   const statusCode = err.statusCode || err.status || 500;
   const message = statusCode === 500 ? "An internal server error occurred" : err.message;
   res.status(statusCode).send({ message });
@@ -76,17 +75,11 @@ const connectWithRetry = () => {
       socketTimeoutMS: 45000,
     })
     .then(() => {
-      console.log("MongoDB connected successfully");
-      console.log("Connected to database:", mongoose.connection.name);
-      console.log("Connection host:", mongoose.connection.host);
-
       app.listen(PORT, () => {
-        console.log(`Server listening on port ${PORT}`);
       });
     })
     .catch((error) => {
       console.error("MongoDB connection error:", error);
-      console.log("Retrying connection in 5 seconds...");
       setTimeout(connectWithRetry, 5000);
     });
 };

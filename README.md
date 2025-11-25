@@ -4,6 +4,13 @@ api.wtwr-app.chickenkiller.com
 wtwr-app.chickenkiller.com
 www.wtwr-app.chickenkiller.com
 
+## Links
+- [Link to Backend] https://github.com/cpeterson27/se_project_express.git
+
+- [Figma Design](https://www.figma.com/file/DTojSwldenF9UPKQZd6RRb/Sprint-10%3A-WTWR)
+
+- [Link to Frontend](https://github.com/cpeterson27/se_project_react.git)
+
 This is a back-end project that is the core server-side component of the What to wear project. The responsibilities are:
 
 - exposing a RESTful API for the front / end clients
