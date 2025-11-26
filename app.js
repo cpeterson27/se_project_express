@@ -1,5 +1,3 @@
-import { NotFoundError } from "./utils/errors/NotFoundError";
-
 require("dotenv").config({ path: "./.env" });
 
 const express = require("express");
@@ -9,6 +7,7 @@ const cors = require("cors");
 const helmet = require('helmet');
 
 const { errors: celebrateErrors, isCelebrateError } = require("celebrate");
+const { NotFoundError } = require("./utils/errors/NotFoundError");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const clothingItemsRouter = require("./routes/clothingItems");
 const usersRouter = require("./routes/users");

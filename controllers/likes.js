@@ -53,7 +53,7 @@ module.exports.getItemLikes = async (req, res, next) => {
     const item = await ClothingItem.findById(id)
       .select("likes")
       .populate("likes", "name avatar")
-      .orFail(() => NotFoundError("Item not found"))
+      .orFail(() => new NotFoundError("Item not found"))
       .lean();
 
     return res.status(200).send(item.likes);
@@ -65,7 +65,7 @@ module.exports.getItemLikes = async (req, res, next) => {
     if (err.name === "CastError") {
       return next (new BadRequestError("Invalid ID format"));
     }
-    return (new InternalServerError("An error has occurred on the server"));
+    return next (new InternalServerError("An error has occurred on the server"));
   }
 };
 
