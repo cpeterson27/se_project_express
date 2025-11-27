@@ -37,7 +37,7 @@ module.exports.addCardLike = async (req, res, next) => {
     if (err.name === "CastError") {
       return next(new BadRequestError("Invalid ID format"));
     }
-    return next(new InternalServerError("An error has occurred on the server"));
+    return next(err);
   }
 };
 

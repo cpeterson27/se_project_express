@@ -1,4 +1,4 @@
-const FORBIDDEN_STATUS_CODE = 409;
+const FORBIDDEN_STATUS_CODE = 403;
 
 class ForbiddenError extends Error {
   constructor(message = "Forbidden") {

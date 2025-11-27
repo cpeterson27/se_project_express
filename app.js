@@ -57,7 +57,7 @@ app.use((err, _req, _res, next) => {
 app.use(errorLogger);
 app.use(celebrateErrors());
 
-app.use((err, _req, res) => {
+app.use((err, _req, res, next) => {
   const statusCode = err.statusCode || err.status || 500;
   const message = statusCode === 500 ? "An internal server error occurred" : err.message;
   res.status(statusCode).send({ message });

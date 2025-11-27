@@ -25,40 +25,86 @@ const validateClothingItem = celebrate({
 
 const validateUserBody = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30).messages({
-      'string.min': 'The minimum length of the "name" field is 2',
-      'string.max': 'The maximum length of the "name" field is 30',
-      }),
-      avatar: Joi.string().custom(validateURL).messages({
-        'string.uri': 'The "avatar" field must be a valid URL',
-      }),
+    name: Joi.string().min(2).max(30).messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
     }),
-  });
+    avatar: Joi.string().custom(validateURL).messages({
+      "string.uri": "Invalid URL format",
+    }),
+    email: Joi.string().required().email().messages({
+      "string.email": 'The "email" field must be a valid email address',
+      "string.empty": 'The "email" field is required',
+    }),
+    password: Joi.string()
+      .required()
+      .min(2)
+      .max(15)
+      .pattern(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()]).{2,15}$/)
+      .messages({
+        "string.empty": 'The "password" field is required',
+        "string.pattern.base":
+          'The "password" must contain at least one letter, one digit, and one special character, and be 2–15 characters long',
+        "string.min": 'The "password" field must be at least 2 characters long',
+        "string.max": 'The "password" field must be at most 15 characters long',
+      }),
+  }),
+});
 
-  const validateAuthentication = celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email().messages({
-        'string.email': 'The "email" field must be a valid email address',
-        'string.empty': 'The "email" field is required',
+const validateSignUp = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30).messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
+      "string.empty": 'The "name" field is required',
+    }),
+    avatar: Joi.string().custom(validateURL).messages({
+      "string.uri": 'The "avatar" field must be a valid URL',
+    }),
+    email: Joi.string().required().email().messages({
+      "string.email": 'The "email" field must be a valid email address',
+      "string.empty": 'The "email" field is required',
+    }),
+    password: Joi.string()
+      .required()
+      .min(2)
+      .max(15)
+      .pattern(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()]).{2,15}$/)
+      .messages({
+        "string.empty": 'The "password" field is required',
+        "string.pattern.base":
+          'The "password" must contain at least one letter, one digit, and one special character, and be 2–15 characters long',
+        "string.min": 'The "password" field must be at least 2 characters long',
+        "string.max": 'The "password" field must be at most 15 characters long',
       }),
-      password: Joi.string().required().messages({
-        'string.empty': 'The "password" field is required',
-      }),
-    })
-  });
+  }),
+});
 
-  const validateId = celebrate({
-      params: Joi.object().keys({
-        id: Joi.string().hex().length(24).required().messages({
-          'string.length': 'The "id" must be 24 hexadecimal characters',
-          'string.hex': 'The "id" must contain only hexadecimal characters',
-        }),
-      }),
-    });
+const validateAuthentication = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email().messages({
+      "string.email": 'The "email" field must be a valid email address',
+      "string.empty": 'The "email" field is required',
+    }),
+    password: Joi.string().required().messages({
+      "string.empty": 'The "password" field is required',
+    }),
+  }),
+});
+
+const validateId = celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().hex().length(24).required().messages({
+      "string.length": 'The "id" must be 24 hexadecimal characters',
+      "string.hex": 'The "id" must contain only hexadecimal characters',
+    }),
+  }),
+});
 
 module.exports = {
   validateClothingItem,
   validateUserBody,
   validateAuthentication,
   validateId,
-  };
+  validateSignUp,
+};

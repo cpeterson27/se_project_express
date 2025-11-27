@@ -21,9 +21,17 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  "rules": {
-    "no-console": ["warn", { "allow": ["error"] }],
-    "no-underscore-dangle": ["error", { "allow": ["_id", "_foo"] }],
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": false, "optionalDependencies": false, "peerDependencies": false }],
-  }
+  rules: {
+    "no-console": ["warn", { allow: ["error"] }],
+    "no-underscore-dangle": ["error", { allow: ["_id", "_foo"] }],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        devDependencies: false,
+        optionalDependencies: false,
+        peerDependencies: false,
+      },
+    ],
+    "no-unused-vars": ["error", { argsIgnorePattern: "next" }],
+  },
 };
