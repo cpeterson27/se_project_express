@@ -32,22 +32,6 @@ const validateUserBody = celebrate({
     avatar: Joi.string().custom(validateURL).messages({
       "string.uri": "Invalid URL format",
     }),
-    email: Joi.string().required().email().messages({
-      "string.email": 'The "email" field must be a valid email address',
-      "string.empty": 'The "email" field is required',
-    }),
-    password: Joi.string()
-      .required()
-      .min(2)
-      .max(15)
-      .pattern(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()]).{2,15}$/)
-      .messages({
-        "string.empty": 'The "password" field is required',
-        "string.pattern.base":
-          'The "password" must contain at least one letter, one digit, and one special character, and be 2–15 characters long',
-        "string.min": 'The "password" field must be at least 2 characters long',
-        "string.max": 'The "password" field must be at most 15 characters long',
-      }),
   }),
 });
 
